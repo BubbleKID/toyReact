@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/BubbleKID/toyReact/issues"
   },
-  "homepage": "https://github.com/BubbleKID/toyReact#readme"
+  "homepage": "https://github.com/BubbleKID/toyReact#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^4.44.1"
+  }
 }
