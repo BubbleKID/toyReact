@@ -2,7 +2,14 @@ import { ToyReact, Componenet } from "./ToyReact.js";
 
 class MyComponent extends Componenet {
   render() {
-    return <div><span>asdasdasd</span>Cool</div>
+    return (
+      <div>
+        <span>asdasdasd</span>
+        <div>
+          {this.children}
+        </div>
+      </div>
+    )
   }
 }
 
