@@ -7,7 +7,7 @@ class ElementWrapper {
       let eventName = RegExp.$1.replace(/^[\s\S]/, s => s.toLocaleLowerCase())
       this.root.addEventListener(eventName, value);
     }
-    if (name === "classsName") {
+    if (name === "className") {
       name = "class";
     }
     this.root.setAttribute(name, value);
