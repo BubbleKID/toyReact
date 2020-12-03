@@ -5,17 +5,29 @@ export class Component {
   constructor() {
     this.props = Object.create(null);
     this.children = [];
-    this._root = null;
-    this._range = null;
+    this.tempRoot = null;
+    this.tempRange = null;
   }
 
   setAttribute(name, value) {
     this.props[name] = value;
   }
 
-  [RENDER_TO_ROM](range) {
+  [RENDER_TO_DOM](range) {
     this.range = range;
     this.update(range);
+  }
+
+  get vdom() {
+    return this.render().vdom;
+  }
+
+  rerender() {
+    const oldRange = this.tempRange;
+    const range = document.createRange();
+    range.setStart(oldRange.startContainer, oldRange.startOffset);
+    range.setEnd(oldRange.startContainer, oldRange.startOffset);
+    this[RENDER_TO_DOM](range);
   }
 
   update() {
@@ -30,30 +42,19 @@ export class Component {
     // placeholder.parentNode.removeChild(placeholder);
   }
 
-  setState(state) {
-    const merge = (oldState, newState) => {
-      for (let p in newState) {
-        if (typeof newState[p] === "object" 
-        && newState[p] !== null) {
-          if (typeof oldState[p] !== "object" ) {
-            if(oldState[p] instanceof Array) {
-              oldState = [];
-            } else {
-              oldState = {};
-            }
-            oldState[p] = {};
-          }
-          merge(oldState[p], newState[p]);
-        } else {
+  setState(newState) {
+    const merge = (oldState) => {
+      Object.keys(newState).forEach((p) => {
+        if (oldState[p] === null || typeof oldState[p] !== 'object') {
           oldState[p] = newState[p];
+        } else {
+          merge(oldState[p], newState[p]);
         }
-      }
+      });
     };
-    if (!this.state && state) {
-      this.state = {};
-    }
-    merge(this.state, state);
-    this.update();
+
+    merge(this.state, newState);
+    this.rerender();
   }
 }
 
@@ -66,7 +67,7 @@ class ElementWrapper extends Component {
 
   setAttribute(name, value) {
     if (name.match(/^on([\s\S]+)$/)) {
-      const eventName = RegExp.$1.replace(/^[\s\S]/, s => s.toLocaleLowerCase())
+      const eventName = RegExp.$1.replace(/^[\s\S]/, (s) => s.toLocaleLowerCase());
       this.root.addEventListener(eventName, value);
     }
     if (name === 'className') {
@@ -95,7 +96,7 @@ class ElementWrapper extends Component {
     vchild.mountTo(range);
   }
 
-  [RENDER_TO_ROM](range) {
+  [RENDER_TO_DOM](range) {
     range.deleteContents();
     range.insertNode(this.root);
   }
@@ -107,14 +108,14 @@ class TextWrapper extends Component {
     this.root = document.createTextNode(content);
   }
 
-  get vdom () {
+  get vdom() {
     return {
       type: '#text',
-      contrent: Text.content
+      contrent: Text.content,
     };
   }
 
-  [RENDER_TO_ROM](range) {
+  [RENDER_TO_DOM](range) {
     range.deleteContents();
     range.insertNode(this.root);
   }
@@ -127,16 +128,16 @@ export const ToyReact = {
     if (typeof type === 'string') {
       element = new ElementWrapper(type);
     } else {
-      element = new type;
+      element = new type();
     }
 
-    for(const name in attributes) {
+    for (const name in attributes) {
       element.setAttribute(name, attributes[name]);
     }
 
     const insertChildren = () => {
       for (let child of children) {
-        if (typeof child === 'object' 
+        if (typeof child === 'object'
         && child instanceof Array) {
           insertChildren(child);
         } else {
