@@ -83,7 +83,7 @@ class Game extends Component {
 
   render() {
     const history = this.state.history;
-    const current = thistory[this.state.stepNumber];
+    const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
@@ -121,8 +121,8 @@ class Game extends Component {
   }
 }
 
-window.game = <Game />;
-ToyReact.render(window.game, document.getElementById("root"));
+// window.game = <Game />;
+// ToyReact.render(window.game, document.getElementById("root"));
 let game = <Game/>;
 
 console.log(game.vdom);

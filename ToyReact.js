@@ -31,14 +31,14 @@ export class Component {
   }
 
   update() {
-    const placeholder = document.createComment('plceholder');
-    const range = document.createRange();
-    range.setStart(this.range.endContainer, this.range.endOffset);
-    range.setEnd(this.range.endContainer, this.range.endOffset);
-    range.insertNode(placeholder);
-    this.range.deleteContents();
-    const vdom = this.render();
-    vdom.mountTo(this.range);
+    // const placeholder = document.createComment('plceholder');
+    // const range = document.createRange();
+    // range.setStart(this.range.endContainer, this.range.endOffset);
+    // range.setEnd(this.range.endContainer, this.range.endOffset);
+    // range.insertNode(placeholder);
+    // this.range.deleteContents();
+    // const vdom = this.render();
+    // vdom.mountTo(this.range);
     // placeholder.parentNode.removeChild(placeholder);
   }
 
@@ -85,15 +85,15 @@ class ElementWrapper extends Component {
   }
 
   appendChild(vchild) {
-    const range = document.createRange();
-    if (this.root.children.length) {
-      range.setStartAfter(this.root.lastChild);
-      range.setEndAfter(this.root.lastChild);
-    } else {
-      range.setStart(this.root, 0);
-      range.setEnd(this.root, 0);
-    }
-    vchild.mountTo(range);
+    // const range = document.createRange();
+    // if (this.root.children.length) {
+    //   range.setStartAfter(this.root.lastChild);
+    //   range.setEndAfter(this.root.lastChild);
+    // } else {
+    //   range.setStart(this.root, 0);
+    //   range.setEnd(this.root, 0);
+    // }
+    // vchild.mountTo(range);
   }
 
   [RENDER_TO_DOM](range) {
@@ -108,7 +108,7 @@ class TextWrapper extends Component {
     this.root = document.createTextNode(content);
   }
 
-  get vdom() {
+  static get vdom() {
     return {
       type: '#text',
       contrent: Text.content,
@@ -122,40 +122,37 @@ class TextWrapper extends Component {
 }
 
 export const ToyReact = {
-  createElement(type, attributes, ...children) {
+  createElement(Type, attributes, ...children) {
     let element;
 
-    if (typeof type === 'string') {
-      element = new ElementWrapper(type);
+    if (typeof Type === 'string') {
+      element = new ElementWrapper(Type);
     } else {
-      element = new type();
+      element = new Type();
     }
 
+    // attributes.forEach((name) => element.setAttribute(name, attributes[name]));
     for (const name in attributes) {
       element.setAttribute(name, attributes[name]);
     }
 
     const insertChildren = () => {
-      for (let child of children) {
-        if (typeof child === 'object'
-        && child instanceof Array) {
+      children.forEach((child) => {
+      // for (let child of children) {
+        if (typeof child === 'object' && child instanceof Array) {
           insertChildren(child);
         } else {
-          if (child === null || child === void 0) {
-            child = '';
-          }
-          if (!(child instanceof Component)
-            && !(child instanceof ElementWrapper)
-            && !(child instanceof TextWrapper)
-          ) {
+          if (!(child instanceof Component) && !(child instanceof ElementWrapper) && !(child instanceof TextWrapper)) {
             child = String(child);
           }
-          if (typeof child === 'string') {
+
+          if (typeof child === 'string' || typeof child === 'number') {
             child = new TextWrapper(child);
           }
+
           element.appendChild(child);
         }
-      }
+      });
     };
 
     insertChildren(children);
@@ -164,7 +161,7 @@ export const ToyReact = {
 
   render(vdom, element) {
     const range = document.createRange();
-    if (element.children.length) {
+    if (element.children && element.children.length) {
       range.setStartAfter(element.lastChild);
       range.setEndAfter(element.lastChild);
     } else {
