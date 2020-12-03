@@ -16,7 +16,9 @@
     "url": "https://github.com/BubbleKID/toyReact/issues"
   },
   "homepage": "https://github.com/BubbleKID/toyReact#readme",
-  "dependencies": {},
+  "dependencies": {
+    "eslint": "^7.14.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.11.1",
     "@babel/plugin-transform-react-jsx": "^7.10.4",
